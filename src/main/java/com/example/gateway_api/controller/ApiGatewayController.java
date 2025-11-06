@@ -1,8 +1,8 @@
 package com.example.gateway_api.controller;
 
 import com.example.gateway_api.dto.UserDTO;
+import com.example.gateway_api.dto.emailrequest.EmailRequest;
 import com.example.gateway_api.service.ApiGatewayService;
-import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -12,38 +12,40 @@ public class ApiGatewayController {
 
     private final ApiGatewayService apiGateway;
 
+
     public ApiGatewayController(ApiGatewayService apiGateway) {
         this.apiGateway = apiGateway;
     }
 
-    // Простой метод для примера переадресации GET-запросов
-    @GetMapping("/users/{id}")
-    public String getUser(@PathVariable Long id) {
+
+    @GetMapping("/get/{id}")
+
+    public UserDTO getUser(@PathVariable Long id) {
         return apiGateway.getUser(id);
-
     }
-
 
 
     @PostMapping("/create")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO updatedUser) {
-        String result = apiGateway.createUser(updatedUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
-
+    public String createUser(@RequestBody UserDTO updatedUser) {
+        return apiGateway.createUser(updatedUser);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUser) {
-        String result = apiGateway.updateUser(id, updatedUser);
-        return ResponseEntity.status(HttpStatus.OK).body(result);
-
+    @PutMapping("/update")
+    public String updateUser(@RequestBody UserDTO updatedUser) {
+        return apiGateway.updateUser(updatedUser);
     }
+
 
     @DeleteMapping("/delete/{id}")
-    public  ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        String result =  apiGateway.deleteUser(id);
-        return ResponseEntity.status(HttpStatus.OK).body(result);
 
+    public String deleteUser(@PathVariable Long id) {
+        return apiGateway.deleteUser(id);
     }
+
+    @PostMapping("/send")
+    public String createUser(@RequestBody EmailRequest request) {
+        return apiGateway.send(request);
+    }
+
 
 }

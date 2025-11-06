@@ -1,19 +1,22 @@
 package com.example.gateway_api.service;
 
+import com.example.gateway_api.controller.ApiGatewayController;
 import com.example.gateway_api.dto.UserDTO;
+import com.example.gateway_api.dto.emailrequest.EmailRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ApiGatewayImpl implements ApiGatewayService {
 
     private final RestTemplate restTemplate;
+    private static final Logger log = LoggerFactory.getLogger(ApiGatewayController.class);
 
     private HttpHeaders headers = new HttpHeaders();
 
@@ -22,62 +25,95 @@ public class ApiGatewayImpl implements ApiGatewayService {
     }
 
     @Override
-    public String getUser(Long id) {
+    public UserDTO getUser(Long id) {
+        HttpEntity<?> requestEntity = new HttpEntity<>(null);
 
-//        addParamForHeaders();
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        try {
+            UserDTO userDTO = this.restTemplate.exchange(
+                            "http://localhost:8098/delivery/get/" + id,
+                            HttpMethod.GET,
+                            requestEntity,
+                            UserDTO.class)
+                    .getBody();
+            return userDTO;
 
-        HttpEntity<?> requestEntity = new HttpEntity<>(body, headers);
+        } catch (Throwable e) {
+            log.error("Ошибка получения пользователя с ID={}, причина: {}", id, e.getMessage());
 
-        // Перенаправляем запрос на нужный микросервис
-        return this.restTemplate.exchange(
-                        "http://localhost:8083/api/user/" + id,
-                        org.springframework.http.HttpMethod.GET,
-                        requestEntity,
-                        String.class)
-                .getBody();
+        }
+        return new UserDTO();
     }
-
 
 
     @Override
     public String createUser(UserDTO updatedUser) {
-        addParamForHeaders();
         HttpEntity<UserDTO> requestEntity = new HttpEntity<>(updatedUser);
-        return restTemplate.exchange(
-                "http://localhost:8083/api/user/create",
-                HttpMethod.POST,
-                requestEntity,
-                String.class).getBody();
+
+        try {
+            String result = restTemplate.exchange(
+                    "http://localhost:8098/delivery/create",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class).getBody();
+            return result;
+
+        } catch (Throwable e) {
+            log.error("Ошибка создания пользователя , причина: {}", e.getMessage());
+
+        }
+
+        return "В данный момент сервер не доступен ";
     }
 
     @Override
     public String deleteUser(Long id) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-        HttpEntity<?> requestEntity = new HttpEntity<>(body, headers);
-
-        // Перенаправляем запрос на нужный микросервис
-        return this.restTemplate.exchange(
-                        "http://localhost:8083/api/user/delete/" + id,
-                        HttpMethod.DELETE,
-                        requestEntity,
-                        String.class)
-                .getBody();
+        HttpEntity<?> requestEntity = new HttpEntity<>(null);
+        try {
+            String result = this.restTemplate.exchange(
+                            "http://localhost:8098/delivery/delete/" + id,
+                            HttpMethod.DELETE,
+                            requestEntity,
+                            String.class)
+                    .getBody();
+            return result;
+        } catch (Throwable e) {
+            log.error("Ошибка удаления  пользователя , причина: {}", e.getMessage());
+        }
+        return "В данный момент сервер не доступен ";
     }
 
     @Override
-    public String updateUser(Long id, UserDTO updatedUser) {
+    public String updateUser(UserDTO updatedUser) {
         addParamForHeaders();
+        HttpEntity<UserDTO> requestEntity = new HttpEntity<>(updatedUser);
+        try {
+            String result = restTemplate.exchange(
+                    "http://localhost:8098/delivery/update",
+                    HttpMethod.PUT,
+                    requestEntity,
+                    String.class).getBody();
+            return result;
+        } catch (Throwable e) {
+            log.error("Ошибка обновления пользователя , причина: {}", e.getMessage());
+        }
+        return "В данный момент сервер не доступен ";
+    }
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-        HttpEntity<?> requestEntity = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(
-                "http://localhost:8083/api/user/update/" + id,
-                HttpMethod.PUT,
-                requestEntity,
-                String.class).getBody();
+    @Override
+    public String send(EmailRequest request) {
+        addParamForHeaders();
+        HttpEntity<EmailRequest> requestEntity = new HttpEntity<>(request);
+        try {
+            String result = restTemplate.exchange(
+                    "http://localhost:8098/delivery/send",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class).getBody();
+            return result;
+        } catch (Throwable e) {
+            log.error("Ошибка отправки письма  пользователю , причина: {}", e.getMessage());
+        }
+        return "В данный момент сервер не доступен ";
     }
 
 
