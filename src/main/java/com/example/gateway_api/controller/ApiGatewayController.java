@@ -46,6 +46,4 @@ public class ApiGatewayController {
     public String createUser(@RequestBody EmailRequest request) {
         return apiGateway.send(request);
     }
-
-
 }

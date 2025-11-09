@@ -30,7 +30,7 @@ public class ApiGatewayImpl implements ApiGatewayService {
 
         try {
             UserDTO userDTO = this.restTemplate.exchange(
-                            "http://localhost:8098/delivery/get/" + id,
+                            "http://discovery-app:8098/delivery/get/" + id,
                             HttpMethod.GET,
                             requestEntity,
                             UserDTO.class)
@@ -51,7 +51,7 @@ public class ApiGatewayImpl implements ApiGatewayService {
 
         try {
             String result = restTemplate.exchange(
-                    "http://localhost:8098/delivery/create",
+                    "http://discovery-app:8098/delivery/create",
                     HttpMethod.POST,
                     requestEntity,
                     String.class).getBody();
@@ -70,7 +70,7 @@ public class ApiGatewayImpl implements ApiGatewayService {
         HttpEntity<?> requestEntity = new HttpEntity<>(null);
         try {
             String result = this.restTemplate.exchange(
-                            "http://localhost:8098/delivery/delete/" + id,
+                            "http://discovery-app:8098/delivery/delete/" + id,
                             HttpMethod.DELETE,
                             requestEntity,
                             String.class)
@@ -88,7 +88,7 @@ public class ApiGatewayImpl implements ApiGatewayService {
         HttpEntity<UserDTO> requestEntity = new HttpEntity<>(updatedUser);
         try {
             String result = restTemplate.exchange(
-                    "http://localhost:8098/delivery/update",
+                    "http://discovery-app:8098/delivery/update",
                     HttpMethod.PUT,
                     requestEntity,
                     String.class).getBody();
@@ -105,7 +105,7 @@ public class ApiGatewayImpl implements ApiGatewayService {
         HttpEntity<EmailRequest> requestEntity = new HttpEntity<>(request);
         try {
             String result = restTemplate.exchange(
-                    "http://localhost:8098/delivery/send",
+                    "http://discovery-app:8098/delivery/send",
                     HttpMethod.POST,
                     requestEntity,
                     String.class).getBody();
@@ -115,7 +115,6 @@ public class ApiGatewayImpl implements ApiGatewayService {
         }
         return "В данный момент сервер не доступен ";
     }
-
 
     private void addParamForHeaders() {
         headers.setContentType(MediaType.APPLICATION_JSON);
